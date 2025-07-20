@@ -33,7 +33,7 @@ class AppTestCase(unittest.TestCase):
         assert "<title>MLH Fellow</title>" in html
         
         # Test main content is present
-        assert "Ace Perez" in html
+        assert "Ayan Mulla" in html
         assert "Software Developer" in html
         
         # Test navigation elements are present

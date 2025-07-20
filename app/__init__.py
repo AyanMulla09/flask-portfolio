@@ -2,50 +2,40 @@ import os
 import datetime
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
-from peewee import MySQLDatabase, Model, CharField, TextField, DateTimeField, DoesNotExist
+from peewee import MySQLDatabase, SqliteDatabase, Model, CharField, TextField, DateTimeField, DoesNotExist, AutoField
 from playhouse.shortcuts import model_to_dict
-import datetime
 
 load_dotenv()
 app = Flask(__name__)
 
 base_url = "/"
 
-# mydb = MySQLDatabase(
-#     os.getenv("MYSQL_DATABASE"),
-#     user=os.getenv("MYSQL_USER"),
-#     password=os.getenv("MYSQL_PASSWORD"),
-#     host=os.getenv("MYSQL_HOST"),
-#     port=3306
-# )
+# Database configuration
 if os.getenv("TESTING") == 'true':
     print("Running in test mode, using SQLite in-memory database")
-    mydb = SqliteDatabase('file:memory?mode=memory&cache=shared', uri=True)
+    mydb = SqliteDatabase(':memory:')
 else:
     mydb = MySQLDatabase(
-    os.getenv("MYSQL_DATABASE"),
-    user=os.getenv("MYSQL_USER"),
-    password=os.getenv("MYSQL_PASSWORD"),
-    host=os.getenv("MYSQL_HOST"),
-    port=3306
-)
+        os.getenv("MYSQL_DATABASE"),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        host=os.getenv("MYSQL_HOST"),
+        port=3306
+    )
 
-class BaseModel(Model):
-    class Meta:
-        database = mydb
-
-from peewee import AutoField
-
-class TimelinePost(BaseModel):
+class TimelinePost(Model):
     id = AutoField()
     name = CharField()
     email = CharField()
     content = TextField()
     created_at = DateTimeField(default=datetime.datetime.now)
+    
+    class Meta:
+        database = mydb
 
-
+# Connect to database and create tables
 mydb.connect()
-mydb.create_tables([TimelinePost])
+mydb.create_tables([TimelinePost], safe=True)
 
 navigation_items = [
     {'name': 'Home', 'url': base_url + '#profile', 'active': False},
@@ -55,31 +45,6 @@ navigation_items = [
     {'name': 'Visited Places', 'url': base_url + '#visited-places', 'active': False},
     {'name': 'Timeline', 'url': '/timeline', 'active': False},
 ]
-
-mydb = MySQLDatabase(os.getenv("MYSQL_DATABASE"),
-                     user= os.getenv("MYSQL_USER"),
-                     password=os.getenv("MYSQL_PASSWORD"),
-                     host=os.getenv("MYSQL_HOST"),
-                        port=3306)
-print(mydb)
-
-from peewee import AutoField
-
-# Import the model-specific DoesNotExist exception for TimelinePost
-TimelinePostDoesNotExist = type('TimelinePost', (object,), {})
-
-
-class TimelinePost(Model):
-    id = AutoField()
-    name = CharField()
-    email = CharField()
-    content = TextField()
-    created_at = DateTimeField(default=datetime.datetime.now)
-    class Meta:
-        database = mydb
-
-mydb.connect()
-mydb.create_tables([TimelinePost], safe=True)
                        
 
 def get_navigation(current_page):
@@ -191,7 +156,7 @@ def index():
     return render_template('index.html',
                          title="MLH Fellow",
                          url=os.getenv("URL"),
-                         name="Ace Perez",
+                         name="Ayan Mulla",
                          role="Software Developer",
                          about_text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                          work_experiences=work_experiences,
