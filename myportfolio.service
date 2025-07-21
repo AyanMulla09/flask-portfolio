@@ -1,0 +1,14 @@
+[Unit]
+Description=My Portfolio Flask Application
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/flask-portfolio
+Environment=PATH=/root/flask-portfolio/python3-virtualenv/bin
+ExecStart=/root/flask-portfolio/python3-virtualenv/bin/python app/__init__.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

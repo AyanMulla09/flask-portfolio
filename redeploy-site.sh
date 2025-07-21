@@ -31,6 +31,20 @@ pip install -r requirements.txt || {
     exit 1
 }
 
+# Ensure MySQL service is running
+echo "Checking MySQL service"
+sudo systemctl start mysql || {
+    echo "Warning: MySQL service might not be running"
+}
+
+# Copy systemd service file to proper location if it doesn't exist
+if [ ! -f /etc/systemd/system/myportfolio.service ]; then
+    echo "Installing systemd service file"
+    sudo cp myportfolio.service /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable myportfolio
+fi
+
 # Restart the systemd service
 echo "Restarting myportfolio service"
 sudo systemctl restart myportfolio || {

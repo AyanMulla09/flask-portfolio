@@ -64,6 +64,7 @@ class AppTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert response.is_json
         json = response.get_json()
+        assert json is not None
         assert "timeline_posts" in json
         # Remove the assumption that timeline_posts is empty
         assert len(json["timeline_posts"]) == 0
