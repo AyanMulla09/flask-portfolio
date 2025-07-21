@@ -47,7 +47,7 @@ pip install -r requirements.txt || {
 
 # Ensure MySQL service is running
 echo "Checking MySQL service"
-sudo systemctl start mysql || {
+sudo systemctl start mysqld || {
     echo "Warning: MySQL service might not be running"
 }
 

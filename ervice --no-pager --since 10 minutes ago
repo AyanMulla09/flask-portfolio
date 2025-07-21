@@ -1,0 +1,15 @@
+[0;1;31m×[0m myportfolio.service - Serve Portfolio Site
+     Loaded: loaded (]8;;file://ayan-mulla/etc/systemd/system/myportfolio.service/etc/systemd/system/myportfolio.service]8;;; [0;1;32menabled[0m; preset: [0;1;38;5;185mdisabled[0m)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Mon 2025-07-21 13:13:21 UTC; 13min ago
+   Duration: 367ms
+    Process: 74803 ExecStart=/root/flask-portfolio/python3-virtualenv/bin/python /root/flask-portfolio/python3-virtualenv/bin/flask run --host=0.0.0.0 [0;1;31m(code=exited, status=1/FAILURE)[0m
+   Main PID: 74803 (code=exited, status=1/FAILURE)
+        CPU: 356ms
+
+Jul 21 13:13:21 ayan-mulla systemd[1]: [0;1;39m[0;1;31m[0;1;39mmyportfolio.service: Main process exited, code=exited, status=1/FAILURE[0m
+Jul 21 13:13:21 ayan-mulla systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmyportfolio.service: Failed with result 'exit-code'.[0m
+Jul 21 13:13:21 ayan-mulla systemd[1]: myportfolio.service: Scheduled restart job, restart counter is at 5.
+Jul 21 13:13:21 ayan-mulla systemd[1]: Stopped Serve Portfolio Site.
+Jul 21 13:13:21 ayan-mulla systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmyportfolio.service: Start request repeated too quickly.[0m
+Jul 21 13:13:21 ayan-mulla systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmyportfolio.service: Failed with result 'exit-code'.[0m
+Jul 21 13:13:21 ayan-mulla systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start Serve Portfolio Site.[0m
