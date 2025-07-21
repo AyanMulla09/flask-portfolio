@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Starting redeployment process"
+echo "Starting local deployment (without Git update)..."
 
 # Change to project directory, exit if not found
 cd /root/flask-portfolio || {
@@ -10,26 +10,7 @@ cd /root/flask-portfolio || {
     exit 1
 }
 
-# Pull latest changes from main branch
-echo "Updating code from Git"
-# First, check if we can access the repository
-if git ls-remote origin > /dev/null 2>&1; then
-    echo "Git access confirmed, pulling latest changes..."
-    git fetch && git reset --hard origin/main || {
-        echo "Error: Failed to update git repository"
-        exit 1
-    }
-else
-    echo "Warning: Cannot access Git repository (SSH key issue or network problem)"
-    echo "Skipping Git update - using current local code"
-    echo "To fix this, either:"
-    echo "1. Set up SSH keys for GitHub access, or"
-    echo "2. Change remote URL to HTTPS: git remote set-url origin https://github.com/AyanMulla09/flask-portfolio.git"
-    echo "3. Or manually pull changes before running this script"
-    echo ""
-    echo "Continuing with deployment using current code..."
-    sleep 3
-fi
+echo "Using current local code (no Git update)"
 
 # Activate virtual environment
 echo "Activating virtual environment"
@@ -70,4 +51,5 @@ sudo systemctl restart myportfolio || {
 echo "Checking service status"
 sudo systemctl status myportfolio --no-pager
 
-echo "Redeployment completed successfully!"
+echo "Local deployment completed successfully!"
+echo "Your app should be running at: http://your-domain:5001"
