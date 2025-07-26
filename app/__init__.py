@@ -15,13 +15,23 @@ if os.getenv("TESTING") == 'true':
     print("Running in test mode, using SQLite in-memory database")
     mydb = SqliteDatabase(':memory:')
 else:
-    mydb = MySQLDatabase(
-        os.getenv("MYSQL_DATABASE"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        host=os.getenv("MYSQL_HOST"),
-        port=3306
-    )
+    # Try MySQL first, fallback to SQLite if MySQL is not available
+    try:
+        mydb = MySQLDatabase(
+            os.getenv("MYSQL_DATABASE"),
+            user=os.getenv("MYSQL_USER"),
+            password=os.getenv("MYSQL_PASSWORD"),
+            host=os.getenv("MYSQL_HOST"),
+            port=3306
+        )
+        # Test the connection
+        mydb.connect()
+        print("Connected to MySQL database")
+    except Exception as e:
+        print(f"MySQL connection failed: {e}")
+        print("Falling back to SQLite database")
+        mydb = SqliteDatabase('portfolio.db')
+        mydb.connect()
 
 class TimelinePost(Model):
     id = AutoField()
@@ -34,8 +44,11 @@ class TimelinePost(Model):
         database = mydb
 
 # Connect to database and create tables
+if not mydb.is_closed():
+    mydb.close()
 mydb.connect()
 mydb.create_tables([TimelinePost], safe=True)
+print("Database tables created successfully")
 
 navigation_items = [
     {'name': 'Home', 'url': base_url + '#profile', 'active': False},
@@ -240,5 +253,5 @@ def timeline_page():
                         navigation=get_navigation('/timeline'),)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
 
