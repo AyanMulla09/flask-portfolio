@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-          
+
       - name: Setup Python virtual environment
         run: python -m venv python3-virtualenv
       
@@ -28,4 +28,4 @@ jobs:
         run: python3-virtualenv/bin/pip install -r requirements.txt
 
       - name: Run tests
-        run: ./run_test.sh
+        run: ./run-test.sh
