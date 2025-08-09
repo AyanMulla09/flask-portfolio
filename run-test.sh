@@ -3,9 +3,13 @@
 # This script is used to run tests for the Flask portfolio application
 echo "Running Flask Portfolio Tests..."
 
-# Navigate to the project directory
-cd /root/flask-portfolio || {
-    echo "Error: Could not find /root/flask-portfolio directory"
+# Get the current working directory
+PROJECT_DIR="$(pwd)"
+echo "Project directory: $PROJECT_DIR"
+
+# Navigate to the project directory (we should already be there in GitHub Actions)
+cd "$PROJECT_DIR" || {
+    echo "Error: Could not navigate to project directory: $PROJECT_DIR"
     exit 1
 }
 
@@ -14,13 +18,19 @@ export TESTING=true
 
 # Activate virtual environment and run tests
 echo "Activating virtual environment..."
-source /root/flask-portfolio/python3-virtualenv/bin/activate || {
-    echo "Error: Failed to activate virtual environment"
+if [ -f "python3-virtualenv/bin/activate" ]; then
+    source python3-virtualenv/bin/activate || {
+        echo "Error: Failed to activate virtual environment"
+        exit 1
+    }
+    PYTHON_CMD="python3-virtualenv/bin/python"
+else
+    echo "Error: Virtual environment not found"
     exit 1
-}
+fi
 
 echo "Running tests..."
-/root/flask-portfolio/python3-virtualenv/bin/python -m unittest discover -s app/tests -v || {
+$PYTHON_CMD -m unittest discover -s app/tests -v || {
     echo "Error: Tests failed"
     exit 1
 }

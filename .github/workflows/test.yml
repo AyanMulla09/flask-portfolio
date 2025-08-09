@@ -27,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: python3-virtualenv/bin/pip install -r requirements.txt
 
+      - name: Make script executable
+        run: chmod +x run-test.sh
+
       - name: Run tests
         run: ./run-test.sh
