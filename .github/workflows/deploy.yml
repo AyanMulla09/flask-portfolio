@@ -11,22 +11,60 @@ jobs:
     name: "Deploy to VPS"
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Configure SSH
         run: |
+          # Create SSH directory
           mkdir -p ~/.ssh/
+          
+          # Write the private key to file
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy-key.pem
+          
+          # Set correct permissions (very important!)
           chmod 600 ~/.ssh/deploy-key.pem
+          chmod 700 ~/.ssh/
+          
+          # Add the host to known_hosts to avoid host key verification
+          ssh-keyscan -H $SSH_IP >> ~/.ssh/known_hosts
+          
+          # Create SSH config
           cat >> ~/.ssh/config <<END
           Host my-vps
             HostName $SSH_IP
             User $SSH_USER
             IdentityFile ~/.ssh/deploy-key.pem
             StrictHostKeyChecking no
+            UserKnownHostsFile ~/.ssh/known_hosts
           END
+          
+          # Set permissions for SSH config
+          chmod 600 ~/.ssh/config
+          
+          # Debug: Check SSH key format (first and last lines only for security)
+          echo "SSH key format check:"
+          head -n 1 ~/.ssh/deploy-key.pem
+          tail -n 1 ~/.ssh/deploy-key.pem
+          
+          # Debug: Test SSH connection
+          echo "Testing SSH connection..."
+          ssh -o ConnectTimeout=10 -o BatchMode=yes my-vps 'echo "SSH connection successful"'
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_IP: ${{ secrets.SSH_IP }}
 
-      - name: Print project root directory
-        run: ssh my-vps 'cd ${{ secrets.PROJECT_ROOT }} && pwd'
+      - name: Deploy to VPS
+        run: |
+          echo "Deploying to project directory: ${{ secrets.PROJECT_ROOT }}"
+          ssh my-vps "cd ${{ secrets.PROJECT_ROOT }} && pwd && ls -la"
+          
+          # You can add more deployment commands here, for example:
+          # ssh my-vps "cd ${{ secrets.PROJECT_ROOT }} && git pull origin main"
+          # ssh my-vps "cd ${{ secrets.PROJECT_ROOT }} && pip install -r requirements.txt"
+          # ssh my-vps "cd ${{ secrets.PROJECT_ROOT }} && sudo systemctl restart your-app-service"
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_IP: ${{ secrets.SSH_IP }}
