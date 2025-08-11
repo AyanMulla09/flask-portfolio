@@ -22,24 +22,47 @@
         <div class="about">
             <h2>Hi</h2>
             <h1>I'm <span class="highlight">{{ name }}</span><br />a <span class="highlight-role">{{ role }}</span></h1>
-            <p>{{ about_text }}</p>
+            <p class="about-description">{{ about_text }}</p>
+            
+            <!-- Call to Action Buttons -->
+            <div class="cta-buttons">
+                <a href="#work-experience" class="btn btn-primary" aria-label="View my work experience">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zM5 8v1.43a24.953 24.953 0 005 .57 24.95 24.95 0 005-.57V8H5z"/>
+                        <path d="M15 11.43V15a2 2 0 01-2 2H7a2 2 0 01-2-2v-3.57a24.95 24.95 0 005 .57 24.95 24.95 0 005-.57z"/>
+                    </svg>
+                    View My Work
+                </a>
+                <a href="/timeline" class="btn btn-primary" aria-label="View timeline and posts">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                        <path d="M3 4a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zM8 4a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1zM8 10a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                    </svg>
+                    Timeline
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
 
 <!-- Work Experience -->
-<section class="hero" id ="work-experience">
+<section class="hero" id="work-experience">
     <div class="hero-text">
         <div class="about work-section">
-            <h2>Work</h2>
+            <h2>Work Experience</h2>
+            <p class="section-description">Professional journey and key achievements</p>
             <div class="experience-container">
                 {% for experience in work_experiences %}
                 <div class="experience-card">
-                    <h3>{{ experience.title }}</h3>
-                    <div class="company">{{ experience.company }}</div>
-                    <div class="duration">{{ experience.duration }}</div>
-                    <ul>
+                    <div class="card-header">
+                        <h3>{{ experience.title }}</h3>
+                        <div class="company-info">
+                            <div class="company">{{ experience.company }}</div>
+                            <div class="duration">{{ experience.duration }}</div>
+                        </div>
+                    </div>
+                    <ul class="achievements-list">
                         {% for achievement in experience.achievements %}
                         <li>{{ achievement }}</li>
                         {% endfor %}
@@ -56,14 +79,19 @@
     <div class="hero-text">
         <div class="about education-section">
             <h2>Education</h2>
+            <p class="section-description">Academic background and achievements</p>
             <div class="education-container">
                 {% for edu in education %}
                 <div class="education-card">
-                    <h3>{{ edu.degree }}</h3>
-                    <div class="school">{{ edu.school }}</div>
-                    <div class="duration">{{ edu.duration }}</div>
+                    <div class="card-header">
+                        <h3>{{ edu.degree }}</h3>
+                        <div class="school-info">
+                            <div class="school">{{ edu.school }}</div>
+                            <div class="duration">{{ edu.duration }}</div>
+                        </div>
+                    </div>
                     {% if edu.achievements %}
-                    <ul>
+                    <ul class="achievements-list">
                         {% for achievement in edu.achievements %}
                         <li>{{ achievement }}</li>
                         {% endfor %}
@@ -81,6 +109,7 @@
     <div class="hero-text">
         <div class="about hobbies-section">
             <h2>Hobbies & Interests</h2>
+            <p class="section-description">What I'm passionate about outside of work</p>
             <div class="hobbies-container">
                 {% for hobby in hobbies %}
                 <div class="hobby-card">
@@ -120,7 +149,10 @@
     <div class="hero-text">
         <div class="about">
             <h2>Places I've Visited</h2>
-            <div id="map" style="height: 400px;"></div>
+            <p class="section-description">Exploring the world, one destination at a time</p>
+            <div class="map-container">
+                <div id="map" style="height: 500px;"></div>
+            </div>
         </div>
     </div>
 </section>

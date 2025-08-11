@@ -198,52 +198,93 @@ def map_page():  # Changed from hobbies_page
 
 @app.route('/api/timeline_post', methods=['POST'])
 def timeline_post():
-    name = request.form.get('name')
-    email = request.form.get('email')
-    content = request.form.get('content')
-    
-    # Validate input
-    if not name or name.strip() == '':
-        return 'Invalid name', 400
-    
-    if not content or content.strip() == '':
-        return 'Invalid content', 400
-    
-    # Basic email validation
-    if not email or '@' not in email or '.' not in email.split('@')[-1]:
-        return 'Invalid email', 400
-    
-    timeline_post = TimelinePost.create(name=name, email=email, content=content)
-
-    return model_to_dict(timeline_post)
+    try:
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        content = request.form.get('content', '').strip()
+        
+        # Enhanced validation
+        errors = []
+        
+        if not name or len(name) < 2:
+            errors.append('Name must be at least 2 characters long')
+        elif len(name) > 50:
+            errors.append('Name must be less than 50 characters')
+        
+        if not email:
+            errors.append('Email is required')
+        elif '@' not in email or '.' not in email.split('@')[-1]:
+            errors.append('Please enter a valid email address')
+        elif len(email) > 100:
+            errors.append('Email is too long')
+        
+        if not content or len(content) < 10:
+            errors.append('Content must be at least 10 characters long')
+        elif len(content) > 500:
+            errors.append('Content must be less than 500 characters')
+        
+        if errors:
+            return {
+                'error': 'Validation failed',
+                'details': errors
+            }, 400
+        
+        # Create the post
+        timeline_post = TimelinePost.create(name=name, email=email, content=content)
+        
+        return {
+            'success': True,
+            'message': 'Post created successfully',
+            'post': model_to_dict(timeline_post)
+        }, 201
+        
+    except Exception as e:
+        print(f"Error creating timeline post: {e}")
+        return {
+            'error': 'Internal server error',
+            'message': 'Failed to create post. Please try again.'
+        }, 500
 
 @app.route('/api/timeline_posts', methods=['GET'])
 def get_timeline_posts():
-    return{
-        'timeline_posts': [
-            model_to_dict(p)
-            for p in TimelinePost.select().order_by(TimelinePost.created_at.desc())
-        ]
-    }
+    try:
+        posts = TimelinePost.select().order_by(TimelinePost.created_at.desc())
+        return {
+            'success': True,
+            'timeline_posts': [model_to_dict(p) for p in posts],
+            'count': len(posts)
+        }
+    except Exception as e:
+        print(f"Error fetching timeline posts: {e}")
+        return {
+            'error': 'Internal server error',
+            'message': 'Failed to load posts. Please try again.',
+            'timeline_posts': []
+        }, 500
 @app.route('/api/timeline_post/<int:post_id>', methods=['DELETE'])
 def delete_timeline_post(post_id):
     try:
         post = TimelinePost.get(TimelinePost.id == post_id)
-
+        post_data = model_to_dict(post)
         post.delete_instance()
 
         return {
-            'message': f'Timeline post {post_id} deleted successfully',
+            'success': True,
+            'message': f'Timeline post deleted successfully',
+            'deleted_post': post_data,
             'deleted_id': post_id
         }, 200
 
     except DoesNotExist:
         return {
-            'error': f'Timeline post with ID {post_id} not found'
+            'error': 'Not found',
+            'message': f'Timeline post with ID {post_id} not found'
         }, 404
     except Exception as e:
+        print(f"Error deleting timeline post {post_id}: {e}")
         return {
-            'error': f'Failed to delete timeline post: {str(e)}'
+            'error': 'Internal server error',
+            'message': f'Failed to delete timeline post. Please try again.'
         }, 500
 
 @app.route('/timeline')

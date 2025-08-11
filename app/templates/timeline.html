@@ -15,25 +15,60 @@
                 <form id="timeline-form">
                     <div class="form-group">
                         <label for="name">Name:</label>
-                        <input type="text" id="name" name="name" required>
+                        <input type="text" id="name" name="name" required maxlength="50" placeholder="Enter your name">
+                        <span class="error-message" id="name-error"></span>
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                        <span class="error-message" id="email-error"></span>
                     </div>
                     <div class="form-group">
                         <label for="content">Content:</label>
-                        <textarea id="content" name="content" rows="4" required></textarea>
+                        <textarea id="content" name="content" rows="4" required maxlength="500" 
+                                  placeholder="Share your thoughts..."></textarea>
+                        <div class="character-count">
+                            <span id="char-count">0</span>/500 characters
+                        </div>
+                        <span class="error-message" id="content-error"></span>
                     </div>
-                    <button type="submit">Post</button>
+                    <button type="submit" id="submit-btn" class="btn-primary">
+                        <span class="btn-text">Post</span>
+                        <span class="btn-loader" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" 
+                                        stroke-width="5" stroke-linecap="round" 
+                                        stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                    <animate attributeName="stroke-array" dur="2s" 
+                                             values="0 31.416;15.708 15.708;0 31.416" 
+                                             repeatCount="indefinite"/>
+                                    <animate attributeName="stroke-dashoffset" dur="2s" 
+                                             values="0;-15.708;-31.416" 
+                                             repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </span>
+                    </button>
                 </form>
             </div>
             
             <!-- Timeline Posts Display -->
             <div class="timeline-posts">
-                <h3>Recent Posts</h3>
-                <div id="posts-container">
-                    <!-- Posts will be loaded here dynamically -->
+                <div class="posts-header">
+                    <h3>Recent Posts</h3>
+                    <button id="refresh-btn" class="btn-secondary" onclick="loadPosts()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+                <div id="posts-container" class="posts-container">
+                    <div class="loading-posts">
+                        <div class="loading-spinner"></div>
+                        <p>Loading posts...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,94 +77,298 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-// Function to get Gravatar URL
-function getGravatarUrl(email) {
-    const hash = CryptoJS.MD5(email.trim().toLowerCase()).toString();
-    return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
-}
-
-// Function to load posts from API
-function loadPosts() {
-    fetch('/api/timeline_posts')
-        .then(response => response.json())
-        .then(data => {
-            const postsContainer = document.getElementById('posts-container');
-            postsContainer.innerHTML = '';
+// Modern Timeline functionality with enhanced UX
+class TimelineManager {
+    constructor() {
+        this.form = document.getElementById('timeline-form');
+        this.submitBtn = document.getElementById('submit-btn');
+        this.postsContainer = document.getElementById('posts-container');
+        this.charCountElement = document.getElementById('char-count');
+        this.contentTextarea = document.getElementById('content');
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.loadPosts();
+    }
+    
+    setupEventListeners() {
+        // Form submission
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        
+        // Character counter
+        this.contentTextarea.addEventListener('input', () => this.updateCharCount());
+        
+        // Real-time validation
+        document.getElementById('name').addEventListener('blur', () => this.validateName());
+        document.getElementById('email').addEventListener('blur', () => this.validateEmail());
+        document.getElementById('content').addEventListener('blur', () => this.validateContent());
+    }
+    
+    updateCharCount() {
+        const length = this.contentTextarea.value.length;
+        this.charCountElement.textContent = length;
+        
+        if (length > 450) {
+            this.charCountElement.style.color = '#ef4444';
+        } else if (length > 400) {
+            this.charCountElement.style.color = '#f59e0b';
+        } else {
+            this.charCountElement.style.color = '#6b7280';
+        }
+    }
+    
+    validateName() {
+        const nameInput = document.getElementById('name');
+        const errorElement = document.getElementById('name-error');
+        const name = nameInput.value.trim();
+        
+        if (name.length < 2) {
+            this.showError(errorElement, 'Name must be at least 2 characters long');
+            return false;
+        } else if (name.length > 50) {
+            this.showError(errorElement, 'Name must be less than 50 characters');
+            return false;
+        }
+        
+        this.clearError(errorElement);
+        return true;
+    }
+    
+    validateEmail() {
+        const emailInput = document.getElementById('email');
+        const errorElement = document.getElementById('email-error');
+        const email = emailInput.value.trim();
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            this.showError(errorElement, 'Please enter a valid email address');
+            return false;
+        }
+        
+        this.clearError(errorElement);
+        return true;
+    }
+    
+    validateContent() {
+        const contentInput = document.getElementById('content');
+        const errorElement = document.getElementById('content-error');
+        const content = contentInput.value.trim();
+        
+        if (content.length < 10) {
+            this.showError(errorElement, 'Content must be at least 10 characters long');
+            return false;
+        } else if (content.length > 500) {
+            this.showError(errorElement, 'Content must be less than 500 characters');
+            return false;
+        }
+        
+        this.clearError(errorElement);
+        return true;
+    }
+    
+    showError(element, message) {
+        element.textContent = message;
+        element.style.display = 'block';
+    }
+    
+    clearError(element) {
+        element.textContent = '';
+        element.style.display = 'none';
+    }
+    
+    async handleSubmit(e) {
+        e.preventDefault();
+        
+        // Validate all fields
+        const isNameValid = this.validateName();
+        const isEmailValid = this.validateEmail();
+        const isContentValid = this.validateContent();
+        
+        if (!isNameValid || !isEmailValid || !isContentValid) {
+            this.showNotification('Please fix the errors above', 'error');
+            return;
+        }
+        
+        this.setLoading(true);
+        
+        try {
+            const formData = new FormData(this.form);
+            const response = await fetch('/api/timeline_post', {
+                method: 'POST',
+                body: formData
+            });
             
-            if (data.timeline_posts && data.timeline_posts.length > 0) {
-                data.timeline_posts.forEach(post => {
-                    const postDiv = document.createElement('div');
-                    postDiv.className = 'timeline-post';
-                    postDiv.innerHTML = `
-                        <div class="post-header">
-                            <img src="${getGravatarUrl(post.email)}" alt="Avatar" class="avatar">
-                            <div class="post-info">
-                                <strong>${post.name}</strong>
-                                <span class="post-date">${new Date(post.created_at).toLocaleString()}</span>
-                            </div>
-                            <button class="delete-btn" onclick="deletePost(${post.id})">Delete</button>
-                        </div>
-                        <div class="post-content">
-                            ${post.content}
-                        </div>
-                    `;
-                    postsContainer.appendChild(postDiv);
-                });
-            } else {
-                postsContainer.innerHTML = '<p>No posts yet. Be the first to post!</p>';
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        })
-        .catch(error => {
+            
+            const data = await response.json();
+            this.form.reset();
+            this.updateCharCount();
+            await this.loadPosts();
+            this.showNotification('Post created successfully! 🎉', 'success');
+            
+        } catch (error) {
+            console.error('Error creating post:', error);
+            this.showNotification('Error creating post. Please try again.', 'error');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+    
+    setLoading(isLoading) {
+        const btnText = this.submitBtn.querySelector('.btn-text');
+        const btnLoader = this.submitBtn.querySelector('.btn-loader');
+        
+        if (isLoading) {
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
+            this.submitBtn.disabled = true;
+        } else {
+            btnText.style.display = 'inline-block';
+            btnLoader.style.display = 'none';
+            this.submitBtn.disabled = false;
+        }
+    }
+    
+    getGravatarUrl(email) {
+        const hash = CryptoJS.MD5(email.trim().toLowerCase()).toString();
+        return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=80`;
+    }
+    
+    async loadPosts() {
+        try {
+            const response = await fetch('/api/timeline_posts');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            this.renderPosts(data.timeline_posts || []);
+            
+        } catch (error) {
             console.error('Error loading posts:', error);
-            alert('Error loading posts');
-        });
-}
-
-// Function to delete a post
-function deletePost(postId) {
-    if (confirm('Are you sure you want to delete this post?')) {
-        fetch(`/api/timeline_post/${postId}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            loadPosts();
-            alert('Post deleted successfully!');
-        })
-        .catch(error => {
+            this.postsContainer.innerHTML = `
+                <div class="error-state">
+                    <p>⚠️ Error loading posts. <a href="#" onclick="timelineManager.loadPosts()">Try again</a></p>
+                </div>
+            `;
+        }
+    }
+    
+    renderPosts(posts) {
+        if (posts.length === 0) {
+            this.postsContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>📝 No posts yet. Be the first to share your thoughts!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        this.postsContainer.innerHTML = posts.map(post => `
+            <div class="timeline-post" data-post-id="${post.id}">
+                <div class="post-header">
+                    <img src="${this.getGravatarUrl(post.email)}" alt="Avatar" class="avatar" loading="lazy">
+                    <div class="post-info">
+                        <h4>${this.escapeHtml(post.name)}</h4>
+                        <span class="post-date">${this.formatDate(post.created_at)}</span>
+                    </div>
+                </div>
+                <div class="post-content">
+                    ${this.escapeHtml(post.content)}
+                </div>
+                <div class="post-actions">
+                    <button class="delete-btn" onclick="timelineManager.deletePost(${post.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    async deletePost(postId) {
+        if (!confirm('Are you sure you want to delete this post?')) return;
+        
+        try {
+            const response = await fetch(`/api/timeline_post/${postId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Remove post with animation
+            const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postElement) {
+                postElement.style.animation = 'slideOut 0.3s ease-in-out';
+                setTimeout(() => this.loadPosts(), 300);
+            }
+            
+            this.showNotification('Post deleted successfully', 'success');
+            
+        } catch (error) {
             console.error('Error deleting post:', error);
-            alert('Error deleting post');
-        });
+            this.showNotification('Error deleting post. Please try again.', 'error');
+        }
+    }
+    
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = now - date;
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        const diffInDays = Math.floor(diffInHours / 24);
+        
+        if (diffInMinutes < 1) return 'Just now';
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        if (diffInHours < 24) return `${diffInHours}h ago`;
+        if (diffInDays < 7) return `${diffInDays}d ago`;
+        
+        return date.toLocaleDateString();
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(n => n.remove());
+        
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 }
 
-// Form submission handler
+// Initialize when DOM is loaded
+let timelineManager;
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('timeline-form');
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        
-        fetch('/api/timeline_post', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            form.reset();
-            loadPosts();
-            alert('Post created successfully!');
-        })
-        .catch(error => {
-            console.error('Error creating post:', error);
-            alert('Error creating post');
-        });
-    });
-    
-    // Load posts on page load
-    loadPosts();
+    timelineManager = new TimelineManager();
 });
 </script>
 {% endblock %}
