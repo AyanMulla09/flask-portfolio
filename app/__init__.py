@@ -71,50 +71,92 @@ def get_navigation(current_page):
 # Data structures for dynamic content
 work_experiences = [
     {
-        'title': 'Senior Software Developer',
-        'company': 'TechCorp Solutions',
-        'duration': 'January 2020 - Present',
+        'title': 'Data Scientist Intern',
+        'company': 'CeADAR - Ireland\'s Centre for AI',
+        'duration': 'May 2025 - Present',
         'achievements': [
-            'Led the development of cloud-native applications using AWS services, resulting in 40% improved scalability',
-            'Implemented CI/CD pipelines using GitHub Actions and AWS CodePipeline',
-            'Mentored junior developers and conducted code reviews to maintain high code quality'
+            'Built an automated research pipeline using LangGraph to discover, filter, and analyze academic papers from arXiv for research gap identification',
+            'Integrated LLMs for intelligent topic generation and full-text analysis',
+            'Engineered modular workflows using Python, Pydantic, and PDF processing tools for scalable, state-driven orchestration',
+            'Designed multi-stage AI relevance filters and structured output pipelines to generate CSV/JSON research insights'
         ]
     },
     {
-        'title': 'Software Developer',
-        'company': 'DataTech Systems',
-        'duration': 'June 2017 - December 2019',
+        'title': 'Production Engineering Fellow',
+        'company': 'Major League Hacking X Meta',
+        'duration': 'June 2025 - Present',
         'achievements': [
-            'Developed and maintained data analytics platforms serving over 100,000 users',
-            'Optimized database queries resulting in 60% faster response times',
-            'Collaborated with cross-functional teams to deliver features on schedule'
+            'Selected for the competitive MLH Fellowship in collaboration with Meta to gain hands-on experience in production engineering',
+            'Participated in weekly training sessions, programming challenges, and deep dives with Meta engineers on topics like scalability, CI/CD, and observability',
+            'Built and maintained infrastructure components using Linux, Python, Docker, and monitoring tools',
+            'Collaborated in an agile team to develop reliable backend systems and debug production-level issues with other fellows'
+        ]
+    },
+    {
+        'title': 'Product Support Engineer',
+        'company': 'VMobi Solutions Private Limited',
+        'duration': 'Oct. 2022 - July 2024',
+        'achievements': [
+            'Utilized expertise in Networking, configuring web servers, and managing control panels to provide technical support to customers',
+            'Automated email workflows to improve message handling and reduce manual errors',
+            'Identified and resolved technical issues pertaining to the product, DNS records, and SMTP configurations',
+            'Collaborated with developers to enhance customer experience; earned 500+ CSATs in 6 months'
+        ]
+    },
+    {
+        'title': 'Project Intern',
+        'company': 'IMA-PG',
+        'duration': 'Aug. 2021 - April 2022',
+        'achievements': [
+            'Collected and cleaned live machine data via PLC; stored results in a SQL database',
+            'Built real-time dashboards with PHP and Chart.js to monitor packaging machine KPIs',
+            'Deployed interface for global technician use and implemented alerting for proactive issue detection',
+            'Successfully published a research paper based on the project performed during the internship'
         ]
     }
 ]
 
-# Education data structure - will be populated by other team members
+# Education data structure
 education = [
     {
-        "degree": "Master of Science in Software Engineering",
-        "school": "University of Technology",
-        "duration": "August 2077 - May 2077",
+        "degree": "Master of Science in Computer Science",
+        "school": "University College Dublin",
+        "duration": "September 2024 - September 2025 (Expected)",
         "achievements": [
-            "Specialized in Cloud Computing and Distributed Systems",
-            "Thesis: 'Optimizing Cloud-Based Data Processing for Large-Scale Applications'",
-            "Participated in various hackathons and coding competitions"
+            "Specializing in advanced computer science topics including machine learning, data science, and software engineering",
+            "Maintaining strong academic performance while gaining practical industry experience",
+            "Actively participating in research projects and academic initiatives"
         ]
     },
     {
-        "degree": "Bachelor of Science in Computer Science",
-        "school": "Tech University",
-        "duration": "August 1337 - May 1337",
+        "degree": "Bachelor of Engineering in Information Technology",
+        "school": "University of Mumbai",
+        "duration": "August 2018 - July 2022",
         "achievements": [
-            "Graduated with Honors",
-            "Relevant Coursework: Data Structures, Algorithms, Database Systems, Cloud Computing",
-            "Capstone Project: Developed a cloud-based application for real-time data analytics"
+            "Completed comprehensive IT program covering software engineering, database systems, and networking",
+            "Gained foundational knowledge in programming, data structures, algorithms, and system design",
+            "Developed strong technical foundation that enabled successful transition to advanced studies and professional roles"
         ]
     }
 ]
+
+# Projects data structure
+projects = [
+    {
+        "name": "NewsFlash",
+        "description": "AI-powered news aggregation and sentiment analysis platform",
+        "technologies": ["Python", "Flask", "OpenAI API", "News API", "Natural Language Processing"],
+        "achievements": [
+            "Built an intelligent news aggregation system that collects articles from multiple sources",
+            "Implemented AI-powered sentiment analysis to categorize news as positive, negative, or neutral",
+            "Developed a clean, responsive web interface for browsing categorized news content",
+            "Integrated multiple APIs to provide comprehensive news coverage and analysis"
+        ],
+        "github_url": "#",  # Add actual GitHub URL if available
+        "demo_url": "#"     # Add actual demo URL if available
+    }
+]
+
 hobbies = [
     {
         'name': 'Photography',
@@ -167,13 +209,14 @@ visited_locations = [
 @app.route('/')
 def index():
     return render_template('index.html',
-                         title="MLH Fellow",
+                         title="Ayan Mulla - Software Developer",
                          url=os.getenv("URL"),
                          name="Ayan Mulla",
-                         role="Software Developer",
-                         about_text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                         role="Data Scientist & Software Engineer",
+                         about_text="Passionate Data Scientist and Software Engineer with experience in machine learning, AI research, and production systems. Currently pursuing a Master's in Computer Science at University College Dublin while working as a Data Scientist Intern at CeADAR and Production Engineering Fellow at MLH x Meta. Skilled in Python, cloud technologies, and building scalable applications that solve real-world problems.",
                          work_experiences=work_experiences,
                          education=education,
+                         projects=projects,
                          hobbies=hobbies,
                          navigation=get_navigation('/'),
                          visited_locations=visited_locations
