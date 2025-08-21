@@ -154,6 +154,45 @@ projects = [
         ],
         "github_url": "#",  # Add actual GitHub URL if available
         "demo_url": "#"     # Add actual demo URL if available
+    },
+    {
+        "name": "Portfolio Website",
+        "description": "Modern, responsive portfolio website built with Flask and optimized for performance",
+        "technologies": ["Python", "Flask", "HTML", "CSS", "JavaScript", "SQLite"],
+        "achievements": [
+            "Designed and developed a fully responsive portfolio website from scratch",
+            "Implemented dark theme with modern CSS variables and animations",
+            "Built interactive timeline feature with CRUD operations",
+            "Optimized for performance and accessibility across all devices"
+        ],
+        "github_url": "#",
+        "demo_url": "#"
+    },
+    {
+        "name": "Real-time Dashboard",
+        "description": "Interactive dashboard for monitoring packaging machine KPIs with live data visualization",
+        "technologies": ["PHP", "Chart.js", "MySQL", "PLC Integration", "JavaScript"],
+        "achievements": [
+            "Developed real-time data collection system from industrial PLCs",
+            "Created interactive dashboards with Chart.js for KPI monitoring",
+            "Implemented alerting system for proactive issue detection",
+            "Deployed globally for technician use across multiple facilities"
+        ],
+        "github_url": "#",
+        "demo_url": "#"
+    },
+    {
+        "name": "AI Research Platform",
+        "description": "Machine learning platform for automated research document analysis and insights generation",
+        "technologies": ["Python", "TensorFlow", "NLP", "Docker", "FastAPI"],
+        "achievements": [
+            "Built automated research pipeline using LangGraph for document analysis",
+            "Integrated LLMs for intelligent topic generation and full-text analysis",
+            "Engineered modular workflows using Python, Pandas, and PDF processing tools",
+            "Designed multi-stage AI relevance filters for generating CSV/JSON research insights"
+        ],
+        "github_url": "#",
+        "demo_url": "#"
     }
 ]
 
