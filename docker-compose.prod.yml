@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     expose:
-      - "5000"
+      - "5000:5000"
     depends_on:
       - mysql
   mysql:
